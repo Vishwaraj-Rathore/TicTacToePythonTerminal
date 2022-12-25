@@ -9,6 +9,7 @@ def PrintBoard():
         print("\n - | - | - " if i!=2 else "")
 
 def UserInput():
+    global userChoice
     while(True):
         userChoice = input("Enter position number: ")
         if(userChoice.isnumeric()):
@@ -16,7 +17,7 @@ def UserInput():
             if(userChoice > 9 or userChoice < 0):
                 print("Position chosen is out of bounds, please enter a valid position.")
                 continue
-            elif(userChoice not in positionsLeft):
+            elif(userChoice not in positionsLeft and userChoice!= 0):
                 print("Position already taken, please enter a valid position.")
                 continue
             else:
@@ -25,5 +26,8 @@ def UserInput():
             print("Please enter a valid position value.")
             continue
 
-UserInput()
-PrintBoard()
+while(True):
+    PrintBoard()
+    UserInput()
+    if(userChoice == 0):
+        break
