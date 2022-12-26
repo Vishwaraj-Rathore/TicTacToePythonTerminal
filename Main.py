@@ -10,6 +10,9 @@ winner = 2
 computerWinMovePref = 0
 computerBlockMovePref = 0
 difficultyChoice = " "
+corners = [1, 3, 7, 9]
+counterHardXMove = 0
+compHardXMoveTempPosition = 0
 
 def PrintBoard():
     global currentBoard
@@ -67,10 +70,10 @@ def PlayerChoice():
                 playerChoice[0] = "o"
             else:
                 playerChoice[0] = "x"
-                ComputerMove()
             while(True):
                 difficultyChoice = input("Please choose difficulty { easy or hard }: ").lower()
                 if(difficultyChoice == "easy" or difficultyChoice == "hard"):
+                    ComputerMove() if difficultyChoice == "easy" else ComputerMoveHardX()
                     break
                 else:
                     print("Entered difficutly is invalid, please choose either easy or hard")
@@ -91,7 +94,6 @@ def ComputerMove():
     xAxis, yAxis = GetAxisForInput(computerChoice)
     currentBoard[xAxis][yAxis] = playerChoice[0]
     positionsLeft.remove(computerChoice)
-    computerWinMovePref = computerBlockMovePref = 0
 
 def BoardCheck():
     global positionsLeft
@@ -117,7 +119,7 @@ def HorizontalCheck():
                 counterComputer += 1
             elif(GetItemAtPosition(a) == playerChoice[1]):
                 counterPlayer += 1
-            else:
+            elif(GetItemAtPosition(a) == " "):
                 positionOfBlank = a
         if(counterComputer == 3):
             winner = 0
@@ -125,9 +127,9 @@ def HorizontalCheck():
         elif(counterPlayer == 3):
             winner = 1
             return True
-        elif(counterComputer == 2):
+        elif(counterComputer == 2 and positionOfBlank != 0):
             computerWinMovePref = positionOfBlank
-        elif(counterPlayer == 2):
+        elif(counterPlayer == 2 and positionOfBlank != 0):
             computerBlockMovePref = positionOfBlank
     return False
 
@@ -143,7 +145,7 @@ def VerticalCheck():
                 counterComputer += 1
             elif(GetItemAtPosition(a) == playerChoice[1]):
                 counterPlayer += 1
-            else:
+            elif(GetItemAtPosition(a) == " "):
                 positionOfBlank = a
         if(counterComputer == 3):
             winner = 0
@@ -151,9 +153,9 @@ def VerticalCheck():
         elif(counterPlayer == 3):
             winner = 1
             return True
-        elif(counterComputer == 2):
+        elif(counterComputer == 2 and positionOfBlank != 0):
             computerWinMovePref = positionOfBlank
-        elif(counterPlayer == 2):
+        elif(counterPlayer == 2 and positionOfBlank != 0):
             computerBlockMovePref = positionOfBlank
     return False
 
@@ -170,7 +172,7 @@ def DiagonalCheck():
                     counterComputer += 1
                 elif(GetItemAtPosition(a) == playerChoice[1]):
                     counterPlayer += 1
-                else:
+                elif(GetItemAtPosition(a) == " "):
                     positionOfBlank = a
         else:
             for j in range(0, 5, 2):
@@ -179,7 +181,7 @@ def DiagonalCheck():
                     counterComputer += 1
                 elif(GetItemAtPosition(a) == playerChoice[1]):
                     counterPlayer += 1
-                else:
+                elif(GetItemAtPosition(a) == " "):
                     positionOfBlank = a
         if(counterComputer == 3):
             winner = 0
@@ -187,9 +189,9 @@ def DiagonalCheck():
         elif(counterPlayer == 3):
             winner = 1
             return True
-        elif(counterComputer == 2):
+        elif(counterComputer == 2 and positionOfBlank != 0):
             computerWinMovePref = positionOfBlank
-        elif(counterPlayer == 2):
+        elif(counterPlayer == 2 and positionOfBlank != 0):
             computerBlockMovePref = positionOfBlank
     return False
 
@@ -229,8 +231,45 @@ def WinnerCheck():
     else:
         return False
 
-def ComputerMoveHard():
-    print("")
+def ComputerMoveHardX():
+    global corners, positionsLeft, counterHardXMove, playerChoice, currentBoard, compHardXMoveTempPosition, difficultyChoice
+    if(counterHardXMove == 0):
+        computerChoice = random.choice(corners)
+        xAxis, yAxis = GetAxisForInput(computerChoice)
+        currentBoard[xAxis][yAxis] = playerChoice[0]
+        positionsLeft.remove(computerChoice)
+        compHardXMoveTempPosition = computerChoice
+        counterHardXMove += 1
+    elif(counterHardXMove == 1):
+        if(GetItemAtPosition(5) == "o"):
+            xAxis, yAxis = GetAxisForInput(DiagnolOpposite(compHardXMoveTempPosition))
+            positionsLeft.remove(DiagnolOpposite(compHardXMoveTempPosition))
+            currentBoard[xAxis][yAxis] = playerChoice[0]
+            compHardXMoveTempPosition = DiagnolOpposite(compHardXMoveTempPosition)
+            counterHardXMove += 1
+    elif(counterHardXMove == 2):
+        for i in corners:
+            if(GetItemAtPosition(i) == "o"):
+                xAxis, yAxis = GetAxisForInput(DiagnolOpposite(i))
+                positionsLeft.remove(DiagnolOpposite(i))
+                currentBoard[xAxis][yAxis] = playerChoice[0]
+                compHardXMoveTempPosition = DiagnolOpposite(i)
+                difficultyChoice = "easy"
+                counterHardXMove += 1
+
+def Intersection(lst1, lst2):
+    lst3 = [value for value in lst1 if value in lst2]
+    return lst3
+
+def DiagnolOpposite(k):
+    if(k == 1):
+        return 9
+    elif(k == 3):
+        return 7
+    elif(k == 9):
+        return 1
+    elif(k == 7):
+        return 3
 
 PlayerChoice()
 
@@ -246,5 +285,5 @@ while(True):
         break
     if(difficultyChoice == "easy"):
         ComputerMove()
-    elif(difficultyChoice == "hard"):
-        ComputerMoveHard()
+    elif(difficultyChoice == "hard" and playerChoice[0] == "x"):
+        ComputerMoveHardX()
