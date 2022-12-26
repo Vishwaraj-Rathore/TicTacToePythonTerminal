@@ -3,6 +3,7 @@ positionsLeft = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 userChoice = 1
 
 def PrintBoard():
+    global currentBoard
     for i in range(3):
         for j in range(3):
             print("",currentBoard[i][j], "|" if j!=2 else "", end="")
