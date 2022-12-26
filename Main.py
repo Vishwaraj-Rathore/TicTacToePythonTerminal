@@ -9,6 +9,7 @@ playerChoice = [" ", " "]
 winner = 2
 computerWinMovePref = 0
 computerBlockMovePref = 0
+difficultyChoice = " "
 
 def PrintBoard():
     global currentBoard
@@ -57,6 +58,7 @@ def PlayerMove():
     positionsLeft.remove(userChoice)
 
 def PlayerChoice():
+    global difficultyChoice
     while(True):
         choiceInput = input("Do you wanna be X or O: ").lower()
         if(choiceInput == "x" or choiceInput == "o"):
@@ -66,6 +68,12 @@ def PlayerChoice():
             else:
                 playerChoice[0] = "x"
                 ComputerMove()
+            while(True):
+                difficultyChoice = input("Please choose difficulty { easy or hard }: ").lower()
+                if(difficultyChoice == "easy" or difficultyChoice == "hard"):
+                    break
+                else:
+                    print("Entered difficutly is invalid, please choose either easy or hard")
             break
         else:
             print("Entered choice is invalid, please choose either X or O")
@@ -221,6 +229,9 @@ def WinnerCheck():
     else:
         return False
 
+def ComputerMoveHard():
+    print("")
+
 PlayerChoice()
 
 while(True):
@@ -233,4 +244,7 @@ while(True):
     PlayerMove()
     if(WinnerCheck()):
         break
-    ComputerMove()
+    if(difficultyChoice == "easy"):
+        ComputerMove()
+    elif(difficultyChoice == "hard"):
+        ComputerMoveHard()
