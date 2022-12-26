@@ -11,8 +11,11 @@ computerWinMovePref = 0
 computerBlockMovePref = 0
 difficultyChoice = " "
 corners = [1, 3, 7, 9]
+squares = [2, 4, 6, 8]
 counterHardXMove = 0
 compHardXMoveTempPosition = 0
+compXWay = 0
+cornerAdjacentSigns = [[1, +1, +1], [3, -1, +1], [7, +1, -1], [9, -1, -1]]
 
 def PrintBoard():
     global currentBoard
@@ -196,7 +199,9 @@ def DiagonalCheck():
     return False
 
 def WinnerCheck():
-    global winner
+    global winner, computerBlockMovePref, computerWinMovePref
+    computerWinMovePref = 0
+    computerBlockMovePref = 0
     if(HorizontalCheck()):
         if(winner == 0):
             PrintBoard()
@@ -232,30 +237,103 @@ def WinnerCheck():
         return False
 
 def ComputerMoveHardX():
-    global corners, positionsLeft, counterHardXMove, playerChoice, currentBoard, compHardXMoveTempPosition, difficultyChoice
-    if(counterHardXMove == 0):
-        computerChoice = random.choice(corners)
-        xAxis, yAxis = GetAxisForInput(computerChoice)
-        currentBoard[xAxis][yAxis] = playerChoice[0]
-        positionsLeft.remove(computerChoice)
-        compHardXMoveTempPosition = computerChoice
-        counterHardXMove += 1
-    elif(counterHardXMove == 1):
-        if(GetItemAtPosition(5) == "o"):
-            xAxis, yAxis = GetAxisForInput(DiagnolOpposite(compHardXMoveTempPosition))
-            positionsLeft.remove(DiagnolOpposite(compHardXMoveTempPosition))
+    global squares, computerWinMovePref, computerBlockMovePref, corners, positionsLeft, counterHardXMove, playerChoice, currentBoard, compHardXMoveTempPosition, difficultyChoice, compXWay
+    options = Intersection(corners, positionsLeft)
+    if(computerWinMovePref == 0 and computerBlockMovePref == 0):
+        if(counterHardXMove == 0):
+            computerChoice = random.choice(options)
+            xAxis, yAxis = GetAxisForInput(computerChoice)
             currentBoard[xAxis][yAxis] = playerChoice[0]
-            compHardXMoveTempPosition = DiagnolOpposite(compHardXMoveTempPosition)
+            positionsLeft.remove(computerChoice)
+            compHardXMoveTempPosition = computerChoice
             counterHardXMove += 1
-    elif(counterHardXMove == 2):
-        for i in corners:
-            if(GetItemAtPosition(i) == "o"):
-                xAxis, yAxis = GetAxisForInput(DiagnolOpposite(i))
-                positionsLeft.remove(DiagnolOpposite(i))
+            return
+        elif(counterHardXMove == 1):
+            if(GetItemAtPosition(5) == "o" ):
+                compXWay = 1
+                xAxis, yAxis = GetAxisForInput(DiagnolOpposite(compHardXMoveTempPosition))
+                positionsLeft.remove(DiagnolOpposite(compHardXMoveTempPosition))
                 currentBoard[xAxis][yAxis] = playerChoice[0]
-                compHardXMoveTempPosition = DiagnolOpposite(i)
-                difficultyChoice = "easy"
+                compHardXMoveTempPosition = DiagnolOpposite(compHardXMoveTempPosition)
                 counterHardXMove += 1
+                return
+            for i in corners:
+                if(GetItemAtPosition(i) == "o"):
+                    compXWay = 2
+                    computerChoice = random.choice(options)
+                    xAxis, yAxis = GetAxisForInput(computerChoice)
+                    currentBoard[xAxis][yAxis] = playerChoice[0]
+                    positionsLeft.remove(computerChoice)
+                    compHardXMoveTempPosition = computerChoice
+                    counterHardXMove += 1
+                    return
+            ad1, ad2 = GetAdjacents(compHardXMoveTempPosition)
+            if(GetItemAtPosition(ad1) == "o" or GetItemAtPosition(ad2) == "o"):
+                compXWay = 3
+                for i in options:
+                    if(GetItemAtPosition(i) == " "):
+                        ad1, ad2 = GetAdjacents(i)
+                        if(GetItemAtPosition(ad1) == " " and GetItemAtPosition(ad2) == " "):
+                            if(i != DiagnolOpposite(compHardXMoveTempPosition)):
+                                xAxis, yAxis = GetAxisForInput(i)
+                                currentBoard[xAxis][yAxis] = playerChoice[0]
+                                positionsLeft.remove(i)
+                                compHardXMoveTempPosition = i
+                                counterHardXMove += 1
+                                return
+            ad1, ad2 = GetAdjacents(DiagnolOpposite(compHardXMoveTempPosition))
+            if(GetItemAtPosition(ad1) == "o" or GetItemAtPosition(ad2) == "o"):
+                compXWay = 4
+                for i in options:
+                    if(GetItemAtPosition(i) == " "):
+                        ad1, ad2 = GetAdjacents(i)
+                        if(GetItemAtPosition(ad1) == " " and GetItemAtPosition(ad2) == " "):
+                            xAxis, yAxis = GetAxisForInput(i)
+                            currentBoard[xAxis][yAxis] = playerChoice[0]
+                            positionsLeft.remove(i)
+                            compHardXMoveTempPosition = i
+                            counterHardXMove += 1
+                            return
+        elif(counterHardXMove == 2):
+            if(compXWay == 1):
+                for i in corners:
+                    if(GetItemAtPosition(i) == "o"):
+                        xAxis, yAxis = GetAxisForInput(DiagnolOpposite(i))
+                        positionsLeft.remove(DiagnolOpposite(i))
+                        currentBoard[xAxis][yAxis] = playerChoice[0]
+                        compHardXMoveTempPosition = DiagnolOpposite(i)
+                        counterHardXMove += 1
+                        return
+            elif(compXWay == 2):
+                    computerChoice = random.choice(options)
+                    xAxis, yAxis = GetAxisForInput(computerChoice)
+                    currentBoard[xAxis][yAxis] = playerChoice[0]
+                    positionsLeft.remove(computerChoice)
+                    compHardXMoveTempPosition = computerChoice
+                    counterHardXMove += 1
+                    return
+            elif(compXWay == 3):
+                for i in options:
+                    if(GetItemAtPosition(i) == " "):
+                        ad1, ad2 = GetAdjacents(i)
+                        if(GetItemAtPosition(ad1) == " " and GetItemAtPosition(ad2) == " "):
+                            xAxis, yAxis = GetAxisForInput(i)
+                            currentBoard[xAxis][yAxis] = playerChoice[0]
+                            positionsLeft.remove(i)
+                            compHardXMoveTempPosition = i
+                            counterHardXMove += 1
+                            return
+            elif(compXWay == 4):
+                xAxis, yAxis = GetAxisForInput(5)
+                currentBoard[xAxis][yAxis] = playerChoice[0]
+                positionsLeft.remove(5)
+                compHardXMoveTempPosition = 5
+                counterHardXMove += 1
+                return
+    else:
+        counterHardXMove += 1
+        ComputerMove()
+        return
 
 def Intersection(lst1, lst2):
     lst3 = [value for value in lst1 if value in lst2]
@@ -270,6 +348,14 @@ def DiagnolOpposite(k):
         return 1
     elif(k == 7):
         return 3
+
+def GetAdjacents(k):
+    global cornerAdjacentSigns
+    for i in range(4):
+        if(cornerAdjacentSigns[i][0] == k):
+            ad1 = k + 1*(cornerAdjacentSigns[i][1])
+            ad2 = k + 3*(cornerAdjacentSigns[i][2])
+            return ad1, ad2
 
 PlayerChoice()
 
