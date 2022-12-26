@@ -1,4 +1,3 @@
-#It actually works!!
 import random
 
 currentBoard = [[" ", " ", " "], [" ", " ", " "], [" ", " ", " "]]
