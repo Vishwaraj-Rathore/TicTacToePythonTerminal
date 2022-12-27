@@ -64,7 +64,7 @@ def PlayerMove():
     positionsLeft.remove(userChoice)
 
 def PlayerChoice():
-    global difficultyChoice
+    global difficultyChoice, playerChoice
     while(True):
         choiceInput = input("Do you wanna be X or O: ").lower()
         if(choiceInput == "x" or choiceInput == "o"):
@@ -76,8 +76,14 @@ def PlayerChoice():
             while(True):
                 difficultyChoice = input("Please choose difficulty { easy or hard }: ").lower()
                 if(difficultyChoice == "easy" or difficultyChoice == "hard"):
-                    ComputerMove() if difficultyChoice == "easy" else ComputerMoveHardX()
-                    break
+                    if(difficultyChoice == "easy" and playerChoice[0] == "x"):
+                        ComputerMove()
+                        break
+                    elif(difficultyChoice == "hard" and playerChoice[0] == "x"):
+                        ComputerMoveHardX()
+                        break
+                    elif((difficultyChoice == "easy" or difficultyChoice == "hard") and playerChoice[0] == "o"):
+                        break
                 else:
                     print("Entered difficutly is invalid, please choose either easy or hard")
             break
@@ -357,6 +363,64 @@ def GetAdjacents(k):
             ad2 = k + 3*(cornerAdjacentSigns[i][2])
             return ad1, ad2
 
+def GetSquareOpposite(k):
+    if(k == 2):
+        return 8
+    elif(k == 4):
+        return 6
+    elif(k == 8):
+        return 2
+    elif(k == 6):
+        return 4
+
+def ComputerMoveHardO():
+    global compXWay, difficultyChoice, squares, corners, currentBoard, playerChoice, positionsLeft, compHardXMoveTempPosition, counterHardXMove, computerWinMovePref, computerBlockMovePref
+    options = Intersection(corners, positionsLeft)
+    if(computerBlockMovePref == 0 and computerWinMovePref == 0):
+        if(counterHardXMove == 0):
+            if(GetItemAtPosition(5) == " "):
+                compXWay = 1
+                xAxis, yAxis = GetAxisForInput(5)
+                currentBoard[xAxis][yAxis] = playerChoice[0]
+                positionsLeft.remove(5)
+                compHardXMoveTempPosition = 5
+                counterHardXMove += 1
+                return
+            elif(GetItemAtPosition(5) == "x"):
+                compXWay = 2
+                computerChoice = random.choice(options)
+                xAxis, yAxis = GetAxisForInput(computerChoice)
+                currentBoard[xAxis][yAxis] = playerChoice[0]
+                positionsLeft.remove(computerChoice)
+                compHardXMoveTempPosition = computerChoice
+                counterHardXMove += 1
+                return
+        if(counterHardXMove == 1):
+            for i in squares:
+                if(GetItemAtPosition(i) == " " and GetItemAtPosition(GetSquareOpposite(i)) == " " and compXWay == 1):
+                    xAxis, yAxis = GetAxisForInput(i)
+                    currentBoard[xAxis][yAxis] = playerChoice[0]
+                    positionsLeft.remove(i)
+                    compHardXMoveTempPosition = i
+                    counterHardXMove += 1
+                    difficultyChoice = "easy"
+                    return
+            if(compXWay == 2):
+                computerChoice = random.choice(options)
+                xAxis, yAxis = GetAxisForInput(computerChoice)
+                currentBoard[xAxis][yAxis] = playerChoice[0]
+                positionsLeft.remove(computerChoice)
+                compHardXMoveTempPosition = computerChoice
+                counterHardXMove += 1
+                return
+        if(counterHardXMove > 1):
+            counterHardXMove += 1
+            ComputerMove()
+            difficultyChoice = "easy"
+    else:
+        counterHardXMove += 1
+        ComputerMove()
+
 PlayerChoice()
 
 while(True):
@@ -370,8 +434,12 @@ while(True):
     if(WinnerCheck()):
         break
     if(difficultyChoice == "easy"):
+        print("hi")
         ComputerMove()
     elif(difficultyChoice == "hard" and playerChoice[0] == "x"):
+        print("ola")
         ComputerMoveHardX()
+    elif(difficultyChoice == "hard" and playerChoice[0] == "o"):
+        ComputerMoveHardO()
 
 input("THE END")
