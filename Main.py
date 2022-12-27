@@ -373,3 +373,5 @@ while(True):
         ComputerMove()
     elif(difficultyChoice == "hard" and playerChoice[0] == "x"):
         ComputerMoveHardX()
+
+input("THE END")
